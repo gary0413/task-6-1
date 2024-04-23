@@ -3,7 +3,7 @@ name: Run Unit Test via Pytest
 on:
   push:
     paths:
-      - '*'  # 只有 Python 檔案的修改會觸發 workflows
+      - 'app.py'  # 只有 Python 檔案的修改會觸發 workflows
     tags:
       - 'v*'      # 打上tag會觸發 workflows
 
