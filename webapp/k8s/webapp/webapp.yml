@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-dp
+  labels:
+    app: web
+spec:
+  replicas: 1 # Change this to the desired number of replicas
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: 218138280714.dkr.ecr.ap-northeast-1.amazonaws.com/task-6-1
+        ports:
+        - containerPort: 5000
