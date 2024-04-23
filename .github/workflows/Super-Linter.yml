@@ -2,10 +2,10 @@ name: Super-Linter Code Base
 
 on:
   push:
-    paths:
-      - 'app.py'  # 只有 Python 檔案的修改會觸發 workflows
-    tags:
-      - 'v*'      # 打上tag會觸發 workflows
+#    paths:
+#      - 'app.py'  # 只有 Python 檔案的修改會觸發 workflows
+#    tags:
+#      - 'v*'      # 打上tag會觸發 workflows
 
 jobs:
   build:
