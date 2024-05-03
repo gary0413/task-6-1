@@ -8,8 +8,8 @@ on:
         required: true
         type: choice
         options:
-          - 'v0.1.5'
-          - 'v0.1.6'
+          - 'v0.1.7'
+          - 'v0.1.8'
 
 env:
   ecr: 827072983716.dkr.ecr.ap-northeast-1.amazonaws.com # 填入你的ECR_URL
