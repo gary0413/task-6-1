@@ -5,35 +5,20 @@ on:
     tags:
       - 'v*'
 
-env:
-  IMAGE_NAME: ${{ github.repository }}
-  SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
-  AWS_REGION: ap-northeast-1
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      contents: read
-      packages: write
-      pull-requests: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ env.SHA }}
+      - uses: actions/checkout@v2
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build and upload to ECR
+      - name: Build and upload to ECS
         uses: vitr/actions-build-and-upload-to-ecs@master
         with:
           access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           account_id: ${{ secrets.AWS_ACCOUNT_ID }}
           repo: task-6-1
-          region: ${{ env.AWS_REGION }}
+          region: ap-northeast-1
           tags: ${{ github.ref_name }}
           create_repo: true
