@@ -38,7 +38,9 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: "{{defaultContext}}"
+          context: ./flask  # 這裡指定 Dockerfile 所在的目錄
+          file: ./flask/Dockerfile  # 這裡明確指出 Dockerfile 的位置
+          push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
