@@ -20,10 +20,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
       - name: Create ECR repository if not exists
         run: |
           aws ecr describe-repositories --repository-names task-6-1 || aws ecr create-repository --repository-name task-6-1
@@ -35,14 +31,3 @@ jobs:
           file: ./flask/Dockerfile
           tags: ${{ steps.login-ecr.outputs.registry }}/task-6-1:${{ github.ref_name }}
           push: true
-
-      - name: Upload to ECS
-        uses: vitr/actions-build-and-upload-to-ecs@master
-        with:
-          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-          repo: task-6-1
-          region: ap-northeast-1
-          tags: ${{ github.ref_name }}
-          create_repo: true
