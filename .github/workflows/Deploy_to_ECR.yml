@@ -10,9 +10,29 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Build and upload to ECS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: Create ECR repository if not exists
+        run: |
+          aws ecr describe-repositories --repository-names task-6-1 || aws ecr create-repository --repository-name task-6-1
+
+      - name: Build, tag, and push image to Amazon ECR
+        uses: docker/build-push-action@v2
+        with:
+          context: ./flask
+          file: ./flask/Dockerfile
+          tags: ${{ steps.login-ecr.outputs.registry }}/task-6-1:${{ github.ref_name }}
+          push: true
+
+      - name: Upload to ECS
         uses: vitr/actions-build-and-upload-to-ecs@master
         with:
           access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
