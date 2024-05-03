@@ -5,12 +5,29 @@ on:
     tags:
       - 'v*'
 
+env:
+  IMAGE_NAME: ${{ github.repository }}
+  SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SHA }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: name/app
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
