@@ -23,11 +23,15 @@ jobs:
         with:
           ref: ${{ env.SHA }}
 
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: name/app
+          images: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -38,8 +42,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./flask  # 這裡指定 Dockerfile 所在的目錄
-          file: ./flask/Dockerfile  # 這裡明確指出 Dockerfile 的位置
+          context: ./flask
+          file: ./flask/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
