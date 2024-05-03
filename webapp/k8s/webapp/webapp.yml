@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: web
-        image: 218138280714.dkr.ecr.ap-northeast-1.amazonaws.com/task-6-1
+        image: 827072983716.dkr.ecr.ap-northeast-1.amazonaws.com/task-6-1:v0.1.5
         ports:
         - containerPort: 5000

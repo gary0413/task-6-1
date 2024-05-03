@@ -1,0 +1,48 @@
+name: Manual Deployment to EKS
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy'
+        required: true
+        type: choice
+        options:
+          - 'v0.1.5'
+          - 'v0.1.6'
+
+env:
+  ecr: 827072983716.dkr.ecr.ap-northeast-1.amazonaws.com # 填入你的ECR_URL
+  image: task-6-1
+  cluster: task-6-1-test
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send workflow URL to Discord
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{"content": "Webapp ${{ github.event.inputs.tag }} 準備部署到 Production! 請協助 Approve: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
+  deploy:
+    needs: notify-discord
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH and execute commands on jump server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.JUMP_SERVER }}
+          username: ${{ secrets.JUMP_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd task-6-1
+            git pull origin main
+            sed -i "s|${{ env.ecr }}/${{ env.image }}:.*|${{ env.ecr }}/${{ env.image }}:${{ github.event.inputs.tag }}|g" webapp/k8s/webapp/webapp.yml
+            kubectl apply -f webapp/k8s/webapp/webapp.yml
