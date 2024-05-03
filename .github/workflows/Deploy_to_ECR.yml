@@ -8,6 +8,7 @@ on:
 env:
   IMAGE_NAME: ${{ github.repository }}
   SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
+  AWS_REGION: ap-northeast-1
 
 jobs:
   build-and-push:
@@ -24,14 +25,12 @@ jobs:
           ref: ${{ env.SHA }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Docker meta
-        id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/${{ env.IMAGE_NAME }}
+          images: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -48,14 +47,3 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Build and upload to ECR
-        uses: vitr/actions-build-and-upload-to-ecs@master
-        with:
-          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-          repo: task-6-1
-          region: ap-northeast-1
-          tags: ${{ github.ref_name }}
-          create_repo: true
